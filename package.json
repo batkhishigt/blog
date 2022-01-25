@@ -8,12 +8,7 @@
     "start": "next start"
   },
   "dependencies": {
-    "@sanity/block-content-to-react": "^2.0.7",
-    "@sanity/client": "^2.2.6",
-    "@sanity/image-url": "^0.140.22",
     "bootstrap": "^4.6.0",
-    "highlight.js": "^10.6.0",
-    "moment": "^2.29.1",
     "next": "10.0.7",
     "react": "17.0.1",
     "react-bootstrap": "^1.5.0",
