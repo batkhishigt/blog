@@ -1,12 +1,20 @@
 import { Card } from "react-bootstrap";
 import Link from "next/link"
+import moment from "moment"
+import { useEffect } from 'react';
+import { urlFor } from 'lib/api';
 export default ({ post }) => {
+  useEffect(() => {
+
+  }, [])
+  moment.locale('mn');
+
   return (
     <Card className={`fj-card`}>
       <div className="card-body-wrapper">
         <Card.Header className="d-flex flex-row">
           <img
-            src={post.publisher.picture}
+            src={urlFor(post.publisher.picture).height(50).url()}
             className="rounded-circle mr-3"
             height="50px"
             width="50px"
@@ -16,14 +24,14 @@ export default ({ post }) => {
             <Card.Title className="font-weight-bold mb-1">
               {post.publisher.title}
             </Card.Title>
-            <Card.Text className="card-date">{post.date}</Card.Text>
+            <Card.Text className="card-date">{moment(post.date).format('lll')}</Card.Text>
           </div>
         </Card.Header>
         <Link href={`/${post.slug}`}>
           <a>
             <div className="view overlay">
               <Card.Img
-                src={post.image}
+                src={urlFor(post.image).height(300).url()}
                 alt="Card image cap"
               />
             </div>
