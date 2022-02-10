@@ -1,11 +1,12 @@
 import { useRouter } from "next/router";
 import { Row, Col } from "react-bootstrap"
 import Layout from "components/layout"
-import { getPostBySlug, getAllPosts } from "lib/api"
-import HighLightCode from "components/HighLightCode"
+import { getPostBySlug, getAllPosts, getPaginatedPosts } from "lib/api"
+import HighLightCode from "components/highlight-code"
 import { urlFor } from 'lib/api';
+import PostHeader from "components/post-header"
+import PreviewAlert from 'components/preview-alert';
 const BlockContent = require('@sanity/block-content-to-react')
-
 const serializers = {
     types: {
         code: (props) => (
@@ -18,42 +19,27 @@ const serializers = {
         ),
         image: (props) => (
             <div className={`blog-image blog-image-${props.node.position}`}>
-                <img src={urlFor(props.node).height(400).url()} alt={props.node.alt} />
+                <img src={urlFor(props.node).width(600).url()} alt={props.node.alt} />
                 <div className="code-filename" style={{ textAlign: "center" }}>{props.node.alt}</div>
             </div>
         ),
     },
 }
-export default ({ post }) => {
+export default ({ post, preview }) => {
+    const router = useRouter();
+    if (router.isFallback) return <Layout>
+        <div>Түр хүлээн үү</div>
+    </Layout>
+    if (!router.isFallback && !post?.slug) return <Layout>
+        <div>uuchlaarai ene post baihgui bna </div>
+    </Layout>
     return (
         <Layout>
             <Row>
                 <Col md="12">
+                    {preview && <PreviewAlert />}
                     {/* <pre>{JSON.stringify(post, null, 2)}</pre> */}
-                    <div className="blog-detail-header">
-                        <p className="lead mb-0">
-                            <img
-
-                                src={post.publisher.picture}
-                                className="rounded-circle mr-3"
-                                height="50px"
-                                width="50px"
-                            />
-                            {post.publisher.title}, {post.date}
-                        </p>
-
-                        <h1 className="font-weight-bold blog-detail-header-title mb-0">
-                            {post.title}
-                        </h1>
-
-                        <h2 className="blog-detail-header-subtitle mb-3">
-                            {post.subtitle}
-                        </h2>
-
-                        <img className="img-fluid rounded" src={urlFor(post.cover_image).height(600).url()} alt={post.cover_image.alt} />
-
-                        <div className="code-filename" style={{ textAlign: "center" }}>{post.cover_image.alt}</div>
-                    </div>
+                    <PostHeader post={post} />
                     <br />
                     <BlockContent blocks={post.content} imageOptions={{ w: 320, h: 240, fit: 'max' }} serializers={serializers} />
                 </Col>
@@ -61,22 +47,22 @@ export default ({ post }) => {
         </Layout>
     );
 }
-export const getStaticProps = async ({ params }) => {
-    const post = await getPostBySlug(params.slug)
+export const getStaticProps = async ({ params, preview = false, previewData }) => {
+
+    const post = await getPostBySlug(params.slug, preview)
     return {
         props: {
-            post: post[0]
+            post: post.length > 1 ? post[1] : post.length > 0 ? post[0] : {}, preview
         }
     }
 }
 export const getStaticPaths = async () => {
-    const posts = await getAllPosts();
-
+    const posts = await getPaginatedPosts(0, 2);
     const data = posts.map((post) => (
         { params: { slug: post.slug, }, }
     ))
     return {
         paths: data,
-        fallback: false
+        fallback: true
     }
 }
