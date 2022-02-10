@@ -216,6 +216,9 @@ body {
 .blog-image {
   margin-bottom: 10px;
   text-align: center;
+  > img {
+    max-width: 100%;
+  }
   &-left {
     float: left;
     margin-right: 30px;
